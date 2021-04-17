@@ -1,9 +1,9 @@
 ﻿// Learn more about F# at http://docs.microsoft.com/dotnet/fsharp
 
-open System
 open System.IO
+open Config
 
-let getBiggestFile folder searchPattern =
+let getBiggestFile folder (searchPattern:SearchPatternType) =
     let getFileSize fileName =
         let bytes = File.ReadAllBytes fileName
         (fileName, bytes.LongLength)
@@ -20,18 +20,38 @@ let getBiggestFile folder searchPattern =
         let recurseOptions = EnumerationOptions()
         recurseOptions.RecurseSubdirectories <- true
 
-        Directory.EnumerateFiles(folder, searchPattern, recurseOptions)
-        |> Seq.map getFileSize
-        |> Seq.fold biggestFile defaultState
+        match searchPattern with
+        | Basic sPat ->
+            Directory.EnumerateFiles(folder, sPat, recurseOptions)
+            |> Seq.map getFileSize
+            |> Seq.fold biggestFile defaultState
+        | BiggestFileInFolder bCont ->
+            let findFile rFolder =
+                Directory.EnumerateFiles(rFolder, bCont.SearchPattern(), recurseOptions)
+
+            Directory.EnumerateDirectories(folder, bCont.Folder, recurseOptions)
+            |> Seq.collect findFile
+            |> Seq.map getFileSize
+            |> Seq.fold biggestFile defaultState
     else
         raise (DirectoryNotFoundException(folder))
 
-let searchForBiggestFiles (config:Config.Config) =
+let searchForBiggestFiles (config:Config) =
     let printResults res =
         printfn "File: %s; Size: %i bytes" (fst res) (snd res)
     
-    let ignoreEmpty searchPattern = 
-        not <| System.String.IsNullOrWhiteSpace searchPattern
+    let ignoreEmpty (searchPattern:SearchPatternType) =
+        let isEmpty s =
+            System.String.IsNullOrWhiteSpace s
+
+        let ShouldIgnore =
+            match searchPattern with
+            | Basic pattern -> 
+                isEmpty pattern
+            | BiggestFileInFolder bCont ->
+               isEmpty bCont.Folder || isEmpty bCont.FileType
+        ShouldIgnore
+        |> not
 
     let getBiggestFile' = getBiggestFile config.RootFolder
 
@@ -44,12 +64,12 @@ let searchForBiggestFiles (config:Config.Config) =
 let main argv =
     let main' (argCon:ArgParsing.ArgContainer) =
         if argCon.Init then
-            Config.createDefaultConfig()
+            createDefaultConfig()
 
         if argCon.ConfigFilePath <> "" then
             let configRes = 
                 argCon.ConfigFilePath
-                |> Config.loadConfig
+                |> loadConfig
 
             match configRes with
             | Ok config -> 
