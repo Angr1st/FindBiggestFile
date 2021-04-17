@@ -30,9 +30,13 @@ let searchForBiggestFiles (config:Config.Config) =
     let printResults res =
         printfn "File: %s; Size: %i bytes" (fst res) (snd res)
     
+    let ignoreEmpty searchPattern = 
+        not <| System.String.IsNullOrWhiteSpace searchPattern
+
     let getBiggestFile' = getBiggestFile config.RootFolder
 
     config.SearchPatterns
+    |> List.filter ignoreEmpty
     |> List.map getBiggestFile'
     |> List.iter printResults
 
