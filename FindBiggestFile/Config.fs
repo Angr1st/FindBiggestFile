@@ -1,10 +1,24 @@
 ﻿module Config
 
+type BiggestFileInFolderContainer =
+    {
+        Folder:string
+        FileType:string
+    }
+    with
+        member this.SearchPattern ()=
+            sprintf "*.%s" this.FileType
+
+type SearchPatternType =
+    | Basic of string
+    | BiggestFileInFolder of BiggestFileInFolderContainer
+
 type Config =
     {
-        SearchPatterns:string list
+        SearchPatterns:SearchPatternType list
         RootFolder:string
     }
+
 
 open System.IO
 open System.Text.Json
@@ -31,7 +45,7 @@ let loadConfig path =
 let createDefaultConfig ()=
     let defaultConfig =
         {
-            SearchPatterns= ["example.txt"]
+            SearchPatterns= [Basic "example.txt"; BiggestFileInFolder {Folder="Test"; FileType="txt"}]
             RootFolder="."
         }
     let initOptions = JsonSerializerOptions(options)
