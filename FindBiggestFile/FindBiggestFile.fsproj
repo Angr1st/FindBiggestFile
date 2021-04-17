@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Example_Config.json" />
     <Compile Include="ArgParsing.fs" />
     <Compile Include="Config.fs" />
     <Compile Include="Program.fs" />
