@@ -25,3 +25,5 @@ let loadConfig path =
             | :? System.Text.Json.JsonException as je -> Error je.Message
     else
         Error (sprintf "Config file did not exist at path: %s!" path)
+
+let createDefaultConfig ()=
