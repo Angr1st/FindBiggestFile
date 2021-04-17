@@ -1,6 +1,20 @@
 {
   "SearchPatterns": [
-    "example.txt"
+    {
+      "Case": "Basic",
+      "Fields": [
+        "example.txt"
+      ]
+    },
+    {
+      "Case": "BiggestFileInFolder",
+      "Fields": [
+        {
+          "Folder": "Test",
+          "FileType": "txt"
+        }
+      ]
+    }
   ],
   "RootFolder": "."
 }
