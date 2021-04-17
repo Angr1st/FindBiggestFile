@@ -37,4 +37,4 @@ let createDefaultConfig ()=
     let initOptions = JsonSerializerOptions(options)
     initOptions.WriteIndented <- true
     let text = JsonSerializer.Serialize(defaultConfig, initOptions)
-    File.WriteAllText("./Example.txt", text)
+    File.WriteAllText("./Example_Config.json", text)
