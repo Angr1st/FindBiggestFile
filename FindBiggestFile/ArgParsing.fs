@@ -17,27 +17,27 @@ type ArgContainer =
         Init:bool
     }
 
-let parser = ArgumentParser<CliArguments> "FindBiggestFile.exe"
-
-let defaultArgContainer =
-    {
-        ConfigFilePath=""
-        Init=false
-    }
-
-let private toArgContainer arguments =
-    let rec parseArguments (list: CliArguments list) (acc:ArgContainer) =
-        match list with
-        | [] -> acc
-        | x::xs ->
-            match x with
-            | ConfigFilePath z -> {acc with ConfigFilePath=z} |> parseArguments xs
-            | Init -> {acc with Init=true} |> parseArguments xs
-
-    
-    parseArguments arguments defaultArgContainer
-
 let parseArguments args =
+    let parser = ArgumentParser<CliArguments> "FindBiggestFile.exe"
+    
+    let defaultArgContainer =
+        {
+            ConfigFilePath=""
+            Init=false
+        }
+
+    let toArgContainer arguments =
+        let rec parseArguments (list: CliArguments list) (acc:ArgContainer) =
+            match list with
+            | [] -> acc
+            | x::xs ->
+                match x with
+                | ConfigFilePath z -> {acc with ConfigFilePath=z} |> parseArguments xs
+                | Init -> {acc with Init=true} |> parseArguments xs
+    
+        
+        parseArguments arguments defaultArgContainer
+
     try
         let parsedResults = parser.Parse args
         let results = parsedResults.GetAllResults()
