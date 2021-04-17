@@ -26,6 +26,16 @@ let getBiggestFile folder searchPattern =
     else
         raise (DirectoryNotFoundException(folder))
 
+let searchForBiggestFiles (config:Config.Config) =
+    let printResults res =
+        printfn "File: %s; Size: %i bytes" (fst res) (snd res)
+    
+    let getBiggestFile' = getBiggestFile config.RootFolder
+
+    config.SearchPatterns
+    |> List.map getBiggestFile'
+    |> List.iter printResults
+
 [<EntryPoint>]
 let main argv =
     let argCon =ArgParsing.parseArguments argv
@@ -34,6 +44,17 @@ let main argv =
         Config.createDefaultConfig()
 
     if argCon.ConfigFilePath <> "" then
-        ()
+        let configRes = 
+            argCon.ConfigFilePath
+            |> Config.loadConfig
 
-    0 // return an integer exit code
+        match configRes with
+        | Ok config -> 
+            config
+            |> searchForBiggestFiles
+            0
+        | Error e -> 
+            eprintfn "%s" e
+            -1
+    else
+        0 // return an integer exit code
