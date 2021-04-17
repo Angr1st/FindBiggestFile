@@ -25,7 +25,7 @@ let defaultArgContainer =
         Init=false
     }
 
-let toArgContainer arguments =
+let private toArgContainer arguments =
     let rec parseArguments (list: CliArguments list) (acc:ArgContainer) =
         match list with
         | [] -> acc
@@ -38,7 +38,13 @@ let toArgContainer arguments =
     parseArguments arguments defaultArgContainer
 
 let parseArguments args =
-    let parsedResults = parser.Parse args
-    let results = parsedResults.GetAllResults()
-    results
-    |> toArgContainer
+    try
+        let parsedResults = parser.Parse args
+        let results = parsedResults.GetAllResults()
+        results
+        |> toArgContainer
+        |> Ok
+    with
+    | :? ArguException as ax -> 
+        eprintfn "%s" ax.Message
+        Error -1
