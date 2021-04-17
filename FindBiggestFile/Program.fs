@@ -38,23 +38,32 @@ let searchForBiggestFiles (config:Config.Config) =
 
 [<EntryPoint>]
 let main argv =
-    let argCon =ArgParsing.parseArguments argv
+    let main' (argCon:ArgParsing.ArgContainer) =
+        if argCon.Init then
+            Config.createDefaultConfig()
 
-    if argCon.Init then
-        Config.createDefaultConfig()
+        if argCon.ConfigFilePath <> "" then
+            let configRes = 
+                argCon.ConfigFilePath
+                |> Config.loadConfig
 
-    if argCon.ConfigFilePath <> "" then
-        let configRes = 
-            argCon.ConfigFilePath
-            |> Config.loadConfig
+            match configRes with
+            | Ok config -> 
+                config
+                |> searchForBiggestFiles
+                Ok 0
+            | Error e -> 
+                eprintfn "%s" e
+                Error -1
+        else
+            Error 0
 
-        match configRes with
-        | Ok config -> 
-            config
-            |> searchForBiggestFiles
-            0
-        | Error e -> 
-            eprintfn "%s" e
-            -1
-    else
-        0 // return an integer exit code
+
+    let result = 
+        argv
+        |> ArgParsing.parseArguments
+        |> Result.bind main'
+    
+    match result with
+    | Ok o -> o
+    | Error e -> e
