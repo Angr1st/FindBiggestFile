@@ -13,3 +13,7 @@ Running it with ```./FindBiggestFile.exe --init``` generates an example config f
 ## Supplying a Config
 
 Running it with ```.FindBiggestFile.exe --configfilepath Example_Config.json``` executes the search for your files.
+
+## Finding the biggest file of a certain type in a certain folder
+
+Using the case "BiggestFileInFolder" you can search for the biggest file with a certain file type in a given folder.
