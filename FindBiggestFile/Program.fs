@@ -58,12 +58,13 @@ let main argv =
         else
             Error 0
 
+    let returnCode (result:Result<int,int>) =
+        match result with
+        | Ok o -> o
+        | Error e -> e
 
-    let result = 
-        argv
-        |> ArgParsing.parseArguments
-        |> Result.bind main'
-    
-    match result with
-    | Ok o -> o
-    | Error e -> e
+
+    argv
+    |> ArgParsing.parseArguments
+    |> Result.bind main'
+    |> returnCode
