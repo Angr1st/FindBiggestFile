@@ -3,7 +3,7 @@
 open Argu
 
 type CliArguments =
-    | [<Mandatory; Unique>] ConfigFilePath of string
+    | [<Unique>] ConfigFilePath of string
     | Init
     interface IArgParserTemplate with
         member s.Usage =
