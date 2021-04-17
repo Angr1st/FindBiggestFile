@@ -30,4 +30,10 @@ let getBiggestFile folder searchPattern =
 let main argv =
     let argCon =ArgParsing.parseArguments argv
 
+    if argCon.Init then
+        Config.createDefaultConfig()
+
+    if argCon.ConfigFilePath <> "" then
+        ()
+
     0 // return an integer exit code
