@@ -14,7 +14,9 @@ let getBiggestFile folder (searchPattern:SearchPatternType) =
         else
             newFile
 
-    let defaultState = ("default", 1L)
+    let createDefaultState fileName = (sprintf "No File found with the name: %s!" fileName, 0L)
+
+    let createDefaultStateContainer container = (sprintf "Inside the folder: %s, no file was found with extension: %s!" container.Folder container.FileType, 0L)
 
     if Directory.Exists folder then
         let recurseOptions = EnumerationOptions()
@@ -24,7 +26,7 @@ let getBiggestFile folder (searchPattern:SearchPatternType) =
         | Basic sPat ->
             Directory.EnumerateFiles(folder, sPat, recurseOptions)
             |> Seq.map getFileSize
-            |> Seq.fold biggestFile defaultState
+            |> Seq.fold biggestFile (createDefaultState sPat)
         | BiggestFileInFolder bCont ->
             let findFile rFolder =
                 Directory.EnumerateFiles(rFolder, bCont.SearchPattern(), recurseOptions)
@@ -32,7 +34,7 @@ let getBiggestFile folder (searchPattern:SearchPatternType) =
             Directory.EnumerateDirectories(folder, bCont.Folder, recurseOptions)
             |> Seq.collect findFile
             |> Seq.map getFileSize
-            |> Seq.fold biggestFile defaultState
+            |> Seq.fold biggestFile (createDefaultStateContainer bCont)
     else
         raise (DirectoryNotFoundException(folder))
 
